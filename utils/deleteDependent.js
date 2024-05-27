@@ -3,9 +3,11 @@
  * @description :: exports deleteDependent service for project.
  */
 
+let Enterprise = require('../model/enterprise');
+let Departments = require('../model/departments');
+let Blog = require('../model/Blog');
 let Client = require('../model/Client');
 let Content = require('../model/Content');
-let Partners = require('../model/Partners');
 let ContactForm = require('../model/ContactForm');
 let Service = require('../model/Service');
 let Chat = require('../model/Chat');
@@ -19,6 +21,45 @@ let RouteRole = require('../model/routeRole');
 let UserRole = require('../model/userRole');
 let dbService = require('.//dbService');
 
+const deleteEnterprise = async (filter) =>{
+  try {
+    let enterprise = await dbService.findMany(Enterprise,filter);
+    if (enterprise && enterprise.length){
+      enterprise = enterprise.map((obj) => obj.id);
+
+      const departmentsFilter = { $or: [{ enterprises : { $in : enterprise } }] };
+      const departmentsCnt = await dbService.deleteMany(Departments,departmentsFilter);
+
+      let deleted  = await dbService.deleteMany(Enterprise,filter);
+      let response = { departments :departmentsCnt, };
+      return response; 
+    } else {
+      return {  enterprise : 0 };
+    }
+
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
+const deleteDepartments = async (filter) =>{
+  try {
+    let response  = await dbService.deleteMany(Departments,filter);
+    return response;
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
+const deleteBlog = async (filter) =>{
+  try {
+    let response  = await dbService.deleteMany(Blog,filter);
+    return response;
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
 const deleteClient = async (filter) =>{
   try {
     let response  = await dbService.deleteMany(Client,filter);
@@ -31,15 +72,6 @@ const deleteClient = async (filter) =>{
 const deleteContent = async (filter) =>{
   try {
     let response  = await dbService.deleteMany(Content,filter);
-    return response;
-  } catch (error){
-    throw new Error(error.message);
-  }
-};
-
-const deletePartners = async (filter) =>{
-  try {
-    let response  = await dbService.deleteMany(Partners,filter);
     return response;
   } catch (error){
     throw new Error(error.message);
@@ -109,14 +141,20 @@ const deleteUser = async (filter) =>{
     if (user && user.length){
       user = user.map((obj) => obj.id);
 
+      const enterpriseFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
+      const enterpriseCnt = await dbService.deleteMany(Enterprise,enterpriseFilter);
+
+      const departmentsFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
+      const departmentsCnt = await dbService.deleteMany(Departments,departmentsFilter);
+
+      const BlogFilter = { $or: [{ updatedBy : { $in : user } },{ addedBy : { $in : user } }] };
+      const BlogCnt = await dbService.deleteMany(Blog,BlogFilter);
+
       const ClientFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ClientCnt = await dbService.deleteMany(Client,ClientFilter);
 
       const ContentFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ContentCnt = await dbService.deleteMany(Content,ContentFilter);
-
-      const PartnersFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
-      const PartnersCnt = await dbService.deleteMany(Partners,PartnersFilter);
 
       const ContactFormFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ContactFormCnt = await dbService.deleteMany(ContactForm,ContactFormFilter);
@@ -153,9 +191,11 @@ const deleteUser = async (filter) =>{
 
       let deleted  = await dbService.deleteMany(User,filter);
       let response = {
+        enterprise :enterpriseCnt,
+        departments :departmentsCnt,
+        Blog :BlogCnt,
         Client :ClientCnt,
         Content :ContentCnt,
-        Partners :PartnersCnt,
         ContactForm :ContactFormCnt,
         Service :ServiceCnt,
         Chat :ChatCnt,
@@ -253,6 +293,43 @@ const deleteUserRole = async (filter) =>{
   }
 };
 
+const countEnterprise = async (filter) =>{
+  try {
+    let enterprise = await dbService.findMany(Enterprise,filter);
+    if (enterprise && enterprise.length){
+      enterprise = enterprise.map((obj) => obj.id);
+
+      const departmentsFilter = { $or: [{ enterprises : { $in : enterprise } }] };
+      const departmentsCnt =  await dbService.count(Departments,departmentsFilter);
+
+      let response = { departments : departmentsCnt, };
+      return response; 
+    } else {
+      return {  enterprise : 0 };
+    }
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
+const countDepartments = async (filter) =>{
+  try {
+    const departmentsCnt =  await dbService.count(Departments,filter);
+    return { departments : departmentsCnt };
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
+const countBlog = async (filter) =>{
+  try {
+    const BlogCnt =  await dbService.count(Blog,filter);
+    return { Blog : BlogCnt };
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
 const countClient = async (filter) =>{
   try {
     const ClientCnt =  await dbService.count(Client,filter);
@@ -266,15 +343,6 @@ const countContent = async (filter) =>{
   try {
     const ContentCnt =  await dbService.count(Content,filter);
     return { Content : ContentCnt };
-  } catch (error){
-    throw new Error(error.message);
-  }
-};
-
-const countPartners = async (filter) =>{
-  try {
-    const PartnersCnt =  await dbService.count(Partners,filter);
-    return { Partners : PartnersCnt };
   } catch (error){
     throw new Error(error.message);
   }
@@ -341,14 +409,20 @@ const countUser = async (filter) =>{
     if (user && user.length){
       user = user.map((obj) => obj.id);
 
+      const enterpriseFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
+      const enterpriseCnt =  await dbService.count(Enterprise,enterpriseFilter);
+
+      const departmentsFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
+      const departmentsCnt =  await dbService.count(Departments,departmentsFilter);
+
+      const BlogFilter = { $or: [{ updatedBy : { $in : user } },{ addedBy : { $in : user } }] };
+      const BlogCnt =  await dbService.count(Blog,BlogFilter);
+
       const ClientFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ClientCnt =  await dbService.count(Client,ClientFilter);
 
       const ContentFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ContentCnt =  await dbService.count(Content,ContentFilter);
-
-      const PartnersFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
-      const PartnersCnt =  await dbService.count(Partners,PartnersFilter);
 
       const ContactFormFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ContactFormCnt =  await dbService.count(ContactForm,ContactFormFilter);
@@ -384,9 +458,11 @@ const countUser = async (filter) =>{
       const userRoleCnt =  await dbService.count(UserRole,userRoleFilter);
 
       let response = {
+        enterprise : enterpriseCnt,
+        departments : departmentsCnt,
+        Blog : BlogCnt,
         Client : ClientCnt,
         Content : ContentCnt,
-        Partners : PartnersCnt,
         ContactForm : ContactFormCnt,
         Service : ServiceCnt,
         Chat : ChatCnt,
@@ -479,6 +555,44 @@ const countUserRole = async (filter) =>{
   }
 };
 
+const softDeleteEnterprise = async (filter,updateBody) =>{  
+  try {
+    let enterprise = await dbService.findMany(Enterprise,filter, { id:1 });
+    if (enterprise.length){
+      enterprise = enterprise.map((obj) => obj.id);
+
+      const departmentsFilter = { '$or': [{ enterprises : { '$in' : enterprise } }] };
+      const departmentsCnt = await dbService.updateMany(Departments,departmentsFilter,updateBody);
+      let updated = await dbService.updateMany(Enterprise,filter,updateBody);
+
+      let response = { departments :departmentsCnt, };
+      return response;
+    } else {
+      return {  enterprise : 0 };
+    }
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
+const softDeleteDepartments = async (filter,updateBody) =>{  
+  try {
+    const departmentsCnt =  await dbService.updateMany(Departments,filter);
+    return { departments : departmentsCnt };
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
+const softDeleteBlog = async (filter,updateBody) =>{  
+  try {
+    const BlogCnt =  await dbService.updateMany(Blog,filter);
+    return { Blog : BlogCnt };
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
 const softDeleteClient = async (filter,updateBody) =>{  
   try {
     const ClientCnt =  await dbService.updateMany(Client,filter);
@@ -492,15 +606,6 @@ const softDeleteContent = async (filter,updateBody) =>{
   try {
     const ContentCnt =  await dbService.updateMany(Content,filter);
     return { Content : ContentCnt };
-  } catch (error){
-    throw new Error(error.message);
-  }
-};
-
-const softDeletePartners = async (filter,updateBody) =>{  
-  try {
-    const PartnersCnt =  await dbService.updateMany(Partners,filter);
-    return { Partners : PartnersCnt };
   } catch (error){
     throw new Error(error.message);
   }
@@ -568,14 +673,20 @@ const softDeleteUser = async (filter,updateBody) =>{
     if (user.length){
       user = user.map((obj) => obj.id);
 
+      const enterpriseFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
+      const enterpriseCnt = await dbService.updateMany(Enterprise,enterpriseFilter,updateBody);
+
+      const departmentsFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
+      const departmentsCnt = await dbService.updateMany(Departments,departmentsFilter,updateBody);
+
+      const BlogFilter = { '$or': [{ updatedBy : { '$in' : user } },{ addedBy : { '$in' : user } }] };
+      const BlogCnt = await dbService.updateMany(Blog,BlogFilter,updateBody);
+
       const ClientFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
       const ClientCnt = await dbService.updateMany(Client,ClientFilter,updateBody);
 
       const ContentFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
       const ContentCnt = await dbService.updateMany(Content,ContentFilter,updateBody);
-
-      const PartnersFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
-      const PartnersCnt = await dbService.updateMany(Partners,PartnersFilter,updateBody);
 
       const ContactFormFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
       const ContactFormCnt = await dbService.updateMany(ContactForm,ContactFormFilter,updateBody);
@@ -612,9 +723,11 @@ const softDeleteUser = async (filter,updateBody) =>{
       let updated = await dbService.updateMany(User,filter,updateBody);
 
       let response = {
+        enterprise :enterpriseCnt,
+        departments :departmentsCnt,
+        Blog :BlogCnt,
         Client :ClientCnt,
         Content :ContentCnt,
-        Partners :PartnersCnt,
         ContactForm :ContactFormCnt,
         Service :ServiceCnt,
         Chat :ChatCnt,
@@ -710,9 +823,11 @@ const softDeleteUserRole = async (filter,updateBody) =>{
 };
 
 module.exports = {
+  deleteEnterprise,
+  deleteDepartments,
+  deleteBlog,
   deleteClient,
   deleteContent,
-  deletePartners,
   deleteContactForm,
   deleteService,
   deleteChat,
@@ -724,9 +839,11 @@ module.exports = {
   deleteProjectRoute,
   deleteRouteRole,
   deleteUserRole,
+  countEnterprise,
+  countDepartments,
+  countBlog,
   countClient,
   countContent,
-  countPartners,
   countContactForm,
   countService,
   countChat,
@@ -738,9 +855,11 @@ module.exports = {
   countProjectRoute,
   countRouteRole,
   countUserRole,
+  softDeleteEnterprise,
+  softDeleteDepartments,
+  softDeleteBlog,
   softDeleteClient,
   softDeleteContent,
-  softDeletePartners,
   softDeleteContactForm,
   softDeleteService,
   softDeleteChat,
