@@ -1,11 +1,12 @@
 /**
- * Partners.js
- * @description :: model of a database collection Partners
+ * enterprise.js
+ * @description :: model of a database collection enterprise
  */
 
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 let idValidator = require('mongoose-id-validator');
+const uniqueValidator = require('mongoose-unique-validator');
 const myCustomLabels = {
   totalDocs: 'itemCount',
   docs: 'data',
@@ -22,21 +23,55 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
 
-    Title:{ type:String },
+    name:{
+      type:String,
+      required:true,
+      unique:true,
+      uniqueCaseInsensitive:true
+    },
 
-    Imagem:{ type:String },
+    email:{
+      type:String,
+      unique:true,
+      required:true,
+      uniqueCaseInsensitive:true
+    },
 
-    Description:{ type:String },
+    phone:{ type:String },
 
-    Link:{ type:String },
+    code:{
+      type:String,
+      minLength:3,
+      lowercase:false,
+      trim:false,
+      required:true,
+      unique:true,
+      uniqueCaseInsensitive:true
+    },
 
-    isDeleted:{ type:Boolean },
+    address:{ type:String },
 
-    isActive:{ type:Boolean },
+    website:{ type:String },
 
-    createdAt:{ type:Date },
+    isActive:{
+      type:Boolean,
+      default:true
+    },
 
-    updatedAt:{ type:Date },
+    isDelete:{
+      type:Boolean,
+      default:false
+    },
+
+    createdAt:{
+      type:Date,
+      default:'on create currentTime'
+    },
+
+    updatedAt:{
+      type:Date,
+      default:'on update currentTime'
+    },
 
     addedBy:{
       type:Schema.Types.ObjectId,
@@ -46,7 +81,9 @@ const schema = new Schema(
     updatedBy:{
       type:Schema.Types.ObjectId,
       ref:'user'
-    }
+    },
+
+    isDeleted:{ type:Boolean }
   }
   ,{ 
     timestamps: { 
@@ -82,5 +119,6 @@ schema.method('toJSON', function () {
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const Partners = mongoose.model('Partners',schema);
-module.exports = Partners;
+schema.plugin(uniqueValidator,{ message: 'Error, expected {VALUE} to be unique.' });
+const enterprise = mongoose.model('enterprise',schema);
+module.exports = enterprise;

@@ -6,9 +6,11 @@
 const express =  require('express');
 const router =  express.Router();
 router.use('/client/auth',require('./auth'));
+router.use(require('./enterpriseRoutes'));
+router.use(require('./departmentsRoutes'));
+router.use(require('./BlogRoutes'));
 router.use(require('./ClientRoutes'));
 router.use(require('./ContentRoutes'));
-router.use(require('./PartnersRoutes'));
 router.use(require('./ContactFormRoutes'));
 router.use(require('./ServiceRoutes'));
 router.use(require('./ChatRoutes'));
