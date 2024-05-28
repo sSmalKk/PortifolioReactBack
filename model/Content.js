@@ -22,7 +22,11 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
 
-    language:{ type:String },
+    Language:{ type:String },
+
+    Content:{ type:Array },
+
+    Source:{ type:String },
 
     isDeleted:{ type:Boolean },
 

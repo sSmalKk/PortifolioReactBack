@@ -10,7 +10,9 @@ const {
 
 /** validation keys and properties of Content */
 exports.schemaKeys = joi.object({
-  language: joi.string().allow(null).allow(''),
+  Language: joi.string().allow(null).allow(''),
+  Content: joi.array().items(),
+  Source: joi.string().allow(null).allow(''),
   isDeleted: joi.boolean(),
   isActive: joi.boolean(),
   Data: joi.array().items(joi.object())
@@ -18,7 +20,9 @@ exports.schemaKeys = joi.object({
 
 /** validation keys and properties of Content for updation */
 exports.updateSchemaKeys = joi.object({
-  language: joi.string().allow(null).allow(''),
+  Language: joi.string().allow(null).allow(''),
+  Content: joi.array().items(),
+  Source: joi.string().allow(null).allow(''),
   isDeleted: joi.boolean(),
   isActive: joi.boolean(),
   Data: joi.array().items(joi.object()),
@@ -31,7 +35,9 @@ exports.findFilterKeys = joi.object({
   options: options,
   ...Object.fromEntries(
     keys.map(key => [key, joi.object({
-      language: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
+      Language: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
+      Content: joi.alternatives().try(joi.array().items(),joi.array().items(),joi.object()),
+      Source: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
       isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       id: joi.any(),
