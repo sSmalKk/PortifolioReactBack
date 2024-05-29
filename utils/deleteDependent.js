@@ -153,9 +153,6 @@ const deleteUser = async (filter) =>{
       const ClientFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ClientCnt = await dbService.deleteMany(Client,ClientFilter);
 
-      const ContentFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
-      const ContentCnt = await dbService.deleteMany(Content,ContentFilter);
-
       const ContactFormFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ContactFormCnt = await dbService.deleteMany(ContactForm,ContactFormFilter);
 
@@ -195,7 +192,6 @@ const deleteUser = async (filter) =>{
         departments :departmentsCnt,
         Blog :BlogCnt,
         Client :ClientCnt,
-        Content :ContentCnt,
         ContactForm :ContactFormCnt,
         Service :ServiceCnt,
         Chat :ChatCnt,
@@ -421,9 +417,6 @@ const countUser = async (filter) =>{
       const ClientFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ClientCnt =  await dbService.count(Client,ClientFilter);
 
-      const ContentFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
-      const ContentCnt =  await dbService.count(Content,ContentFilter);
-
       const ContactFormFilter = { $or: [{ addedBy : { $in : user } },{ updatedBy : { $in : user } }] };
       const ContactFormCnt =  await dbService.count(ContactForm,ContactFormFilter);
 
@@ -462,7 +455,6 @@ const countUser = async (filter) =>{
         departments : departmentsCnt,
         Blog : BlogCnt,
         Client : ClientCnt,
-        Content : ContentCnt,
         ContactForm : ContactFormCnt,
         Service : ServiceCnt,
         Chat : ChatCnt,
@@ -685,9 +677,6 @@ const softDeleteUser = async (filter,updateBody) =>{
       const ClientFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
       const ClientCnt = await dbService.updateMany(Client,ClientFilter,updateBody);
 
-      const ContentFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
-      const ContentCnt = await dbService.updateMany(Content,ContentFilter,updateBody);
-
       const ContactFormFilter = { '$or': [{ addedBy : { '$in' : user } },{ updatedBy : { '$in' : user } }] };
       const ContactFormCnt = await dbService.updateMany(ContactForm,ContactFormFilter,updateBody);
 
@@ -727,7 +716,6 @@ const softDeleteUser = async (filter,updateBody) =>{
         departments :departmentsCnt,
         Blog :BlogCnt,
         Client :ClientCnt,
-        Content :ContentCnt,
         ContactForm :ContactFormCnt,
         Service :ServiceCnt,
         Chat :ChatCnt,

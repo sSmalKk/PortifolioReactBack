@@ -22,42 +22,13 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
 
-    language:{ type:String },
+    Lang:{ type:Array },
 
-    isDeleted:{ type:Boolean },
-
-    isActive:{ type:Boolean },
-
-    createdAt:{ type:Date },
-
-    updatedAt:{ type:Date },
-
-    addedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
-    },
-
-    updatedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
-    },
-
-    Data:[{
-      _id:false,
-      Content:{ type:String },
-      Location:{ type:String }
-    }]
-  }
-  ,{ 
-    timestamps: { 
-      createdAt: 'createdAt', 
-      updatedAt: 'updatedAt' 
-    } 
+    isDeleted:{ type:Boolean }
   }
 );
 schema.pre('save', async function (next) {
   this.isDeleted = false;
-  this.isActive = true;
   next();
 });
 
@@ -66,7 +37,6 @@ schema.pre('insertMany', async function (next, docs) {
     for (let index = 0; index < docs.length; index++) {
       const element = docs[index];
       element.isDeleted = false;
-      element.isActive = true;
     }
   }
   next();
