@@ -25,7 +25,6 @@ const addClient = async (req, res) => {
     if (!validateRequest.isValid) {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
-    dataToCreate.addedBy = req.user.id;
     dataToCreate = new Client(dataToCreate);
 
     let checkUniqueFields = await utils.checkUniqueFieldsInDatabase(Client,[ 'Ip' ],dataToCreate,'INSERT');
@@ -52,12 +51,6 @@ const bulkInsertClient = async (req,res)=>{
       return res.badRequest();
     }
     let dataToCreate = [ ...req.body.data ];
-    for (let i = 0;i < dataToCreate.length;i++){
-      dataToCreate[i] = {
-        ...dataToCreate[i],
-        addedBy: req.user.id
-      };
-    }
 
     let checkUniqueFields = await utils.checkUniqueFieldsInDatabase(Client,[ 'Ip' ],dataToCreate,'BULK_INSERT');
     if (checkUniqueFields.isDuplicate){
@@ -169,10 +162,7 @@ const getClientCount = async (req,res) => {
  */
 const updateClient = async (req,res) => {
   try {
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       ClientSchemaKey.updateSchemaKeys
@@ -207,12 +197,8 @@ const bulkUpdateClient = async (req,res)=>{
   try {
     let filter = req.body && req.body.filter ? { ...req.body.filter } : {};
     let dataToUpdate = {};
-    delete dataToUpdate['addedBy'];
     if (req.body && typeof req.body.data === 'object' && req.body.data !== null) {
-      dataToUpdate = { 
-        ...req.body.data,
-        updatedBy : req.user.id
-      };
+      dataToUpdate = { ...req.body.data, };
     }
 
     let checkUniqueFields = await utils.checkUniqueFieldsInDatabase(Client,[ 'Ip' ],dataToUpdate,'BULK_UPDATE', filter);
@@ -241,11 +227,7 @@ const partialUpdateClient = async (req,res) => {
     if (!req.params.id){
       res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
-    delete req.body['addedBy'];
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       ClientSchemaKey.updateSchemaKeys
@@ -281,10 +263,7 @@ const softDeleteClient = async (req,res) => {
       return res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
     let query = { _id:req.params.id };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedClient = await dbService.updateOne(Client, query, updateBody);
     if (!updatedClient){
       return res.recordNotFound();
@@ -354,10 +333,7 @@ const softDeleteManyClient = async (req,res) => {
       return res.badRequest();
     }
     const query = { _id:{ $in:ids } };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedClient = await dbService.updateMany(Client,query, updateBody);
     if (!updatedClient) {
       return res.recordNotFound();

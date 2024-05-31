@@ -73,10 +73,7 @@ const bulkInsertClient = async (req,res)=>{
  */
 const updateClient = async (req,res) => {
   try {
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       ClientSchemaKey.updateSchemaKeys
@@ -111,12 +108,8 @@ const bulkUpdateClient = async (req,res)=>{
   try {
     let filter = req.body && req.body.filter ? { ...req.body.filter } : {};
     let dataToUpdate = {};
-    delete dataToUpdate['addedBy'];
     if (req.body && typeof req.body.data === 'object' && req.body.data !== null) {
-      dataToUpdate = { 
-        ...req.body.data,
-        updatedBy : req.user.id
-      };
+      dataToUpdate = { ...req.body.data, };
     }
 
     let checkUniqueFields = await utils.checkUniqueFieldsInDatabase(Client,[ 'Ip' ],dataToUpdate,'BULK_UPDATE', filter);
@@ -145,11 +138,7 @@ const partialUpdateClient = async (req,res) => {
     if (!req.params.id){
       res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
-    delete req.body['addedBy'];
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       ClientSchemaKey.updateSchemaKeys

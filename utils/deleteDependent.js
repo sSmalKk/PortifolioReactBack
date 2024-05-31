@@ -3,11 +3,11 @@
  * @description :: exports deleteDependent service for project.
  */
 
+let Lang = require('../model/Lang');
 let Enterprise = require('../model/enterprise');
 let Departments = require('../model/departments');
 let Blog = require('../model/Blog');
 let Client = require('../model/Client');
-let Content = require('../model/Content');
 let ContactForm = require('../model/ContactForm');
 let Service = require('../model/Service');
 let Chat = require('../model/Chat');
@@ -20,6 +20,15 @@ let ProjectRoute = require('../model/projectRoute');
 let RouteRole = require('../model/routeRole');
 let UserRole = require('../model/userRole');
 let dbService = require('.//dbService');
+
+const deleteLang = async (filter) =>{
+  try {
+    let response  = await dbService.deleteMany(Lang,filter);
+    return response;
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
 
 const deleteEnterprise = async (filter) =>{
   try {
@@ -63,15 +72,6 @@ const deleteBlog = async (filter) =>{
 const deleteClient = async (filter) =>{
   try {
     let response  = await dbService.deleteMany(Client,filter);
-    return response;
-  } catch (error){
-    throw new Error(error.message);
-  }
-};
-
-const deleteContent = async (filter) =>{
-  try {
-    let response  = await dbService.deleteMany(Content,filter);
     return response;
   } catch (error){
     throw new Error(error.message);
@@ -289,6 +289,15 @@ const deleteUserRole = async (filter) =>{
   }
 };
 
+const countLang = async (filter) =>{
+  try {
+    const LangCnt =  await dbService.count(Lang,filter);
+    return { Lang : LangCnt };
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
 const countEnterprise = async (filter) =>{
   try {
     let enterprise = await dbService.findMany(Enterprise,filter);
@@ -330,15 +339,6 @@ const countClient = async (filter) =>{
   try {
     const ClientCnt =  await dbService.count(Client,filter);
     return { Client : ClientCnt };
-  } catch (error){
-    throw new Error(error.message);
-  }
-};
-
-const countContent = async (filter) =>{
-  try {
-    const ContentCnt =  await dbService.count(Content,filter);
-    return { Content : ContentCnt };
   } catch (error){
     throw new Error(error.message);
   }
@@ -547,6 +547,15 @@ const countUserRole = async (filter) =>{
   }
 };
 
+const softDeleteLang = async (filter,updateBody) =>{  
+  try {
+    const LangCnt =  await dbService.updateMany(Lang,filter);
+    return { Lang : LangCnt };
+  } catch (error){
+    throw new Error(error.message);
+  }
+};
+
 const softDeleteEnterprise = async (filter,updateBody) =>{  
   try {
     let enterprise = await dbService.findMany(Enterprise,filter, { id:1 });
@@ -589,15 +598,6 @@ const softDeleteClient = async (filter,updateBody) =>{
   try {
     const ClientCnt =  await dbService.updateMany(Client,filter);
     return { Client : ClientCnt };
-  } catch (error){
-    throw new Error(error.message);
-  }
-};
-
-const softDeleteContent = async (filter,updateBody) =>{  
-  try {
-    const ContentCnt =  await dbService.updateMany(Content,filter);
-    return { Content : ContentCnt };
   } catch (error){
     throw new Error(error.message);
   }
@@ -811,11 +811,11 @@ const softDeleteUserRole = async (filter,updateBody) =>{
 };
 
 module.exports = {
+  deleteLang,
   deleteEnterprise,
   deleteDepartments,
   deleteBlog,
   deleteClient,
-  deleteContent,
   deleteContactForm,
   deleteService,
   deleteChat,
@@ -827,11 +827,11 @@ module.exports = {
   deleteProjectRoute,
   deleteRouteRole,
   deleteUserRole,
+  countLang,
   countEnterprise,
   countDepartments,
   countBlog,
   countClient,
-  countContent,
   countContactForm,
   countService,
   countChat,
@@ -843,11 +843,11 @@ module.exports = {
   countProjectRoute,
   countRouteRole,
   countUserRole,
+  softDeleteLang,
   softDeleteEnterprise,
   softDeleteDepartments,
   softDeleteBlog,
   softDeleteClient,
-  softDeleteContent,
   softDeleteContactForm,
   softDeleteService,
   softDeleteChat,

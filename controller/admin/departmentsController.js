@@ -29,7 +29,6 @@ const addDepartments = async (req, res) => {
     if (!validateRequest.isValid) {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
-    dataToCreate.addedBy = req.user.id;
     dataToCreate = new Departments(dataToCreate);
 
     let checkUniqueFields = await utils.checkUniqueFieldsInDatabase(Departments,[ 'name', 'code', 'email' ],dataToCreate,'INSERT');
@@ -60,7 +59,6 @@ const bulkInsertDepartments = async (req,res)=>{
       dataToCreate[i] = {
         ...{ 'createdAt':(Date.now()).toString() },
         ...dataToCreate[i],
-        addedBy: req.user.id
       };
     }
 
@@ -177,7 +175,6 @@ const updateDepartments = async (req,res) => {
     let dataToUpdate = {
       ...{ 'updatedAt':(Date.now()).toString() },
       ...req.body,
-      updatedBy:req.user.id,
     };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
@@ -213,12 +210,10 @@ const bulkUpdateDepartments = async (req,res)=>{
   try {
     let filter = req.body && req.body.filter ? { ...req.body.filter } : {};
     let dataToUpdate = {};
-    delete dataToUpdate['addedBy'];
     if (req.body && typeof req.body.data === 'object' && req.body.data !== null) {
       dataToUpdate = { 
         ...{ 'updatedAt':(Date.now()).toString() },
         ...req.body.data,
-        updatedBy : req.user.id
       };
     }
 
@@ -248,11 +243,7 @@ const partialUpdateDepartments = async (req,res) => {
     if (!req.params.id){
       res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
-    delete req.body['addedBy'];
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       departmentsSchemaKey.updateSchemaKeys
@@ -288,10 +279,7 @@ const softDeleteDepartments = async (req,res) => {
       return res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
     let query = { _id:req.params.id };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedDepartments = await dbService.updateOne(Departments, query, updateBody);
     if (!updatedDepartments){
       return res.recordNotFound();
@@ -361,10 +349,7 @@ const softDeleteManyDepartments = async (req,res) => {
       return res.badRequest();
     }
     const query = { _id:{ $in:ids } };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedDepartments = await dbService.updateMany(Departments,query, updateBody);
     if (!updatedDepartments) {
       return res.recordNotFound();

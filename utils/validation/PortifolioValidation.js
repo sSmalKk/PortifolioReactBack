@@ -16,6 +16,10 @@ exports.schemaKeys = joi.object({
   Content: joi.string().required(),
   isDeleted: joi.boolean(),
   isActive: joi.boolean().required(),
+  createdAt: joi.date().options({ convert: true }).required(),
+  updatedAt: joi.date().options({ convert: true }).required(),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
   initialDate: joi.date().options({ convert: true }).allow(null).allow(''),
   finalDate: joi.date().options({ convert: true }).allow(null).allow(''),
   progress: joi.number().integer().required(),
@@ -42,6 +46,26 @@ exports.updateSchemaKeys = joi.object({
   }),
   isDeleted: joi.boolean(),
   isActive: joi.boolean().when({
+    is:joi.exist(),
+    then:joi.required(),
+    otherwise:joi.optional()
+  }),
+  createdAt: joi.date().options({ convert: true }).when({
+    is:joi.exist(),
+    then:joi.required(),
+    otherwise:joi.optional()
+  }),
+  updatedAt: joi.date().options({ convert: true }).when({
+    is:joi.exist(),
+    then:joi.required(),
+    otherwise:joi.optional()
+  }),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).when({
+    is:joi.exist(),
+    then:joi.required(),
+    otherwise:joi.optional()
+  }),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).when({
     is:joi.exist(),
     then:joi.required(),
     otherwise:joi.optional()
@@ -73,6 +97,10 @@ exports.findFilterKeys = joi.object({
       Content: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
       isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+      createdAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      updatedAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      addedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
+      updatedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
       initialDate: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
       finalDate: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
       progress: joi.alternatives().try(joi.array().items(),joi.number().integer(),joi.object()),

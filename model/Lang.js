@@ -1,6 +1,6 @@
 /**
- * Content.js
- * @description :: model of a database collection Content
+ * Lang.js
+ * @description :: model of a database collection Lang
  */
 
 const mongoose = require('mongoose');
@@ -22,7 +22,11 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
 
-    Lang:{ type:Array },
+    Language:{ type:String },
+
+    Source:{ type:String },
+
+    Content:{ type:String },
 
     isDeleted:{ type:Boolean }
   }
@@ -52,5 +56,5 @@ schema.method('toJSON', function () {
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const Content = mongoose.model('Content',schema);
-module.exports = Content;
+const Lang = mongoose.model('Lang',schema);
+module.exports = Lang;

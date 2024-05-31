@@ -22,9 +22,6 @@ const verifyCallback = (req, resolve, reject, platform) => async (error, user, i
     return reject('Unauthorized User');
   }
   req.user = user;
-  if (!user.isActive) {
-    return reject('User is deactivated');
-  }
   let userToken = await dbService.findOne(userTokens,{
     token:(req.headers.authorization).replace('Bearer ',''),
     userId:user.id

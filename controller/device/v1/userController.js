@@ -27,7 +27,6 @@ const getLoggedInUserInfo = async (req, res) => {
       _id: req.user.id,
       isDeleted: false 
     };
-    query.isActive = true;
     let foundUser = await dbService.findOne(User, query);
     if (!foundUser) {
       return res.recordNotFound();
@@ -315,8 +314,6 @@ const updateProfile = async (req, res) => {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
     delete data.password;
-    delete data.createdAt;
-    delete data.updatedAt;
     if (data.id) delete data.id;
     let result = await dbService.updateOne(User,{ _id:req.user.id },data,{ new:true });
     if (!result){

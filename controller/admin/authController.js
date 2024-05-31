@@ -117,7 +117,7 @@ const forgotPassword = async (req,res) => {
       return res.badRequest({ message : 'Insufficient request parameters! email is required.' });
     }
     let where = { email: params.email };
-    where.isActive = true;where.isDeleted = false;            params.email = params.email.toString().toLowerCase();
+    where.isDeleted = false;            params.email = params.email.toString().toLowerCase();
     let found = await dbService.findOne(User,where);
     if (!found) {
       return res.recordNotFound();
@@ -153,7 +153,6 @@ const validateResetPasswordOtp = async (req,res) =>{
     }
     const where = { 
       'resetPasswordLink.code': params.otp,
-      isActive: true,
       isDeleted: false,            
     };
     let found = await dbService.findOne(User, where);
@@ -184,7 +183,6 @@ const resetPassword = async (req,res) => {
     }
     const where = { 
       'resetPasswordLink.code': params.code,
-      isActive: true,
       isDeleted: false,            
     };
     let found = await dbService.findOne(User, where);
