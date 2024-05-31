@@ -15,6 +15,10 @@ exports.schemaKeys = joi.object({
   admin: joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
   customer: joi.array().items(),
   isActive: joi.boolean(),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   isDeleted: joi.boolean()
 }).unknown(true);
 
@@ -37,6 +41,10 @@ exports.updateSchemaKeys = joi.object({
   }),
   customer: joi.array().items(),
   isActive: joi.boolean(),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   isDeleted: joi.boolean(),
   _id: joi.string().regex(/^[0-9a-fA-F]{24}$/)
 }).unknown(true);
@@ -52,6 +60,10 @@ exports.findFilterKeys = joi.object({
       admin: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
       customer: joi.alternatives().try(joi.array().items(),joi.array().items(),joi.object()),
       isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+      createdAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      updatedAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      updatedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
+      addedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
       isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       id: joi.any(),
       _id: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object())

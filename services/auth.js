@@ -43,7 +43,7 @@ const generateToken = async (user,secret) => {
 const loginUser = async (username,password,platform,roleAccess) => {
   try {
     let where = { $or:[{ username:username },{ email:username }] };
-    where.isActive =  true;where.isDeleted = false;            let user = await dbService.findOne(User,where);
+    where.isDeleted = false;            let user = await dbService.findOne(User,where);
     if (user) {
       if (user.loginRetryLimit >= MAX_LOGIN_RETRY_LIMIT){
         let now = dayjs();
@@ -77,7 +77,6 @@ const loginUser = async (username,password,platform,roleAccess) => {
           await dbService.updateOne(User,
             {
               _id:user.id,
-              isActive :true,
               isDeleted :false
             },
             {
@@ -96,7 +95,6 @@ const loginUser = async (username,password,platform,roleAccess) => {
           await dbService.updateOne(User,
             {
               _id:user.id,
-              isActive :true,
               isDeleted : false
             },
             { loginRetryLimit:user.loginRetryLimit + 1 });
@@ -187,7 +185,6 @@ const changePassword = async (params)=>{
     let oldPassword = params.oldPassword;
     let where = { 
       _id:params.userId,
-      isActive: true,
       isDeleted: false,        
     };
     let user = await dbService.findOne(User,where);
@@ -232,7 +229,6 @@ const sendResetPasswordNotification = async (user) => {
   try {
     let where = { 
       _id:user.id,
-      isActive: true,
       isDeleted: false,        
     };
     let token = uuid();
@@ -298,7 +294,6 @@ const resetPassword = async (user, newPassword) => {
   try {
     let where = { 
       _id:user.id,
-      isActive: true,
       isDeleted: false,        
     };
     const dbUser = await dbService.findOne(User,where);

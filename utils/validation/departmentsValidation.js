@@ -19,6 +19,10 @@ exports.schemaKeys = joi.object({
   address: joi.string().required(),
   isActive: joi.boolean().default(true),
   isDelete: joi.boolean().default(false),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   isDeleted: joi.boolean(),
   img: joi.string().allow(null).allow('')
 }).unknown(true);
@@ -46,6 +50,10 @@ exports.updateSchemaKeys = joi.object({
   }),
   isActive: joi.boolean().default(true),
   isDelete: joi.boolean().default(false),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   isDeleted: joi.boolean(),
   img: joi.string().allow(null).allow(''),
   _id: joi.string().regex(/^[0-9a-fA-F]{24}$/)
@@ -66,6 +74,10 @@ exports.findFilterKeys = joi.object({
       address: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
       isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       isDelete: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+      createdAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      updatedAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      addedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
+      updatedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
       isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       img: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
       id: joi.any(),

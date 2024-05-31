@@ -72,12 +72,6 @@ const schema = new Schema(
       ref:'user'
     }
   }
-  ,{ 
-    timestamps: { 
-      createdAt: 'createdAt', 
-      updatedAt: 'updatedAt' 
-    } 
-  }
 );
 schema.index({ 'title':1 },{ 'name':'index_title' });
 schema.index({ 'publishDate':-1 },{ 'name':'index_publishdate' });
@@ -94,7 +88,6 @@ schema.pre('save',async function (next){
     
 schema.pre('save', async function (next) {
   this.isDeleted = false;
-  this.isActive = true;
   next();
 });
 
@@ -103,7 +96,6 @@ schema.pre('insertMany', async function (next, docs) {
     for (let index = 0; index < docs.length; index++) {
       const element = docs[index];
       element.isDeleted = false;
-      element.isActive = true;
     }
   }
   next();

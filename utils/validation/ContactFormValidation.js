@@ -12,6 +12,10 @@ const {
 exports.schemaKeys = joi.object({
   isDeleted: joi.boolean(),
   isActive: joi.boolean(),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   Mensagem: joi.array().items(),
   type: joi.string().allow(null).allow('')
 }).unknown(true);
@@ -20,6 +24,10 @@ exports.schemaKeys = joi.object({
 exports.updateSchemaKeys = joi.object({
   isDeleted: joi.boolean(),
   isActive: joi.boolean(),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   Mensagem: joi.array().items(),
   type: joi.string().allow(null).allow(''),
   _id: joi.string().regex(/^[0-9a-fA-F]{24}$/)
@@ -33,6 +41,10 @@ exports.findFilterKeys = joi.object({
     keys.map(key => [key, joi.object({
       isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+      createdAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      updatedAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      addedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
+      updatedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
       Mensagem: joi.alternatives().try(joi.array().items(),joi.array().items(),joi.object()),
       type: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
       id: joi.any(),

@@ -15,6 +15,10 @@ exports.schemaKeys = joi.object({
   tokenExpiredTime: joi.date().options({ convert: true }).allow(null).allow(''),
   isTokenExpired: joi.boolean().default(false),
   isActive: joi.boolean(),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
   isDeleted: joi.boolean()
 }).unknown(true);
 
@@ -25,6 +29,10 @@ exports.updateSchemaKeys = joi.object({
   tokenExpiredTime: joi.date().options({ convert: true }).allow(null).allow(''),
   isTokenExpired: joi.boolean().default(false),
   isActive: joi.boolean(),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
   isDeleted: joi.boolean(),
   _id: joi.string().regex(/^[0-9a-fA-F]{24}$/)
 }).unknown(true);
@@ -40,6 +48,10 @@ exports.findFilterKeys = joi.object({
       tokenExpiredTime: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
       isTokenExpired: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+      addedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
+      updatedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
+      createdAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      updatedAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
       isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       id: joi.any(),
       _id: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object())

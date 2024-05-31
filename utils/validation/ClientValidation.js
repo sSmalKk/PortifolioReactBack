@@ -13,6 +13,10 @@ exports.schemaKeys = joi.object({
   Data: joi.string().required(),
   isDeleted: joi.boolean(),
   isActive: joi.boolean(),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   Ip: joi.string().required()
 }).unknown(true);
 
@@ -25,6 +29,10 @@ exports.updateSchemaKeys = joi.object({
   }),
   isDeleted: joi.boolean(),
   isActive: joi.boolean(),
+  createdAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  updatedAt: joi.date().options({ convert: true }).allow(null).allow(''),
+  addedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
+  updatedBy: joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null).allow(''),
   Ip: joi.string().when({
     is:joi.exist(),
     then:joi.required(),
@@ -42,6 +50,10 @@ exports.findFilterKeys = joi.object({
       Data: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
       isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
       isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+      createdAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      updatedAt: joi.alternatives().try(joi.array().items(),joi.date().options({ convert: true }),joi.object()),
+      addedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
+      updatedBy: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object()),
       Ip: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
       id: joi.any(),
       _id: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object())

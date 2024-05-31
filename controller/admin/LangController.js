@@ -1,79 +1,72 @@
 /**
- * ContentController.js
- * @description : exports action methods for Content.
+ * LangController.js
+ * @description : exports action methods for Lang.
  */
 
-const Content = require('../../model/Content');
-const ContentSchemaKey = require('../../utils/validation/ContentValidation');
+const Lang = require('../../model/Lang');
+const LangSchemaKey = require('../../utils/validation/LangValidation');
 const validation = require('../../utils/validateRequest');
 const dbService = require('../../utils/dbService');
 const ObjectId = require('mongodb').ObjectId;
 const utils = require('../../utils/common');
    
 /**
- * @description : create document of Content in mongodb collection.
+ * @description : create document of Lang in mongodb collection.
  * @param {Object} req : request including body for creating document.
  * @param {Object} res : response of created document
- * @return {Object} : created Content. {status, message, data}
+ * @return {Object} : created Lang. {status, message, data}
  */ 
-const addContent = async (req, res) => {
+const addLang = async (req, res) => {
   try {
     let dataToCreate = { ...req.body || {} };
     let validateRequest = validation.validateParamsWithJoi(
       dataToCreate,
-      ContentSchemaKey.schemaKeys);
+      LangSchemaKey.schemaKeys);
     if (!validateRequest.isValid) {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
-    dataToCreate.addedBy = req.user.id;
-    dataToCreate = new Content(dataToCreate);
-    let createdContent = await dbService.create(Content,dataToCreate);
-    return res.success({ data : createdContent });
+    dataToCreate = new Lang(dataToCreate);
+    let createdLang = await dbService.create(Lang,dataToCreate);
+    return res.success({ data : createdLang });
   } catch (error) {
     return res.internalServerError({ message:error.message }); 
   }
 };
     
 /**
- * @description : create multiple documents of Content in mongodb collection.
+ * @description : create multiple documents of Lang in mongodb collection.
  * @param {Object} req : request including body for creating documents.
  * @param {Object} res : response of created documents.
- * @return {Object} : created Contents. {status, message, data}
+ * @return {Object} : created Langs. {status, message, data}
  */
-const bulkInsertContent = async (req,res)=>{
+const bulkInsertLang = async (req,res)=>{
   try {
     if (req.body && (!Array.isArray(req.body.data) || req.body.data.length < 1)) {
       return res.badRequest();
     }
     let dataToCreate = [ ...req.body.data ];
-    for (let i = 0;i < dataToCreate.length;i++){
-      dataToCreate[i] = {
-        ...dataToCreate[i],
-        addedBy: req.user.id
-      };
-    }
-    let createdContents = await dbService.create(Content,dataToCreate);
-    createdContents = { count: createdContents ? createdContents.length : 0 };
-    return res.success({ data:{ count:createdContents.count || 0 } });
+    let createdLangs = await dbService.create(Lang,dataToCreate);
+    createdLangs = { count: createdLangs ? createdLangs.length : 0 };
+    return res.success({ data:{ count:createdLangs.count || 0 } });
   } catch (error){
     return res.internalServerError({ message:error.message });
   }
 };
     
 /**
- * @description : find all documents of Content from collection based on query and options.
+ * @description : find all documents of Lang from collection based on query and options.
  * @param {Object} req : request including option and query. {query, options : {page, limit, pagination, populate}, isCountOnly}
  * @param {Object} res : response contains data found from collection.
- * @return {Object} : found Content(s). {status, message, data}
+ * @return {Object} : found Lang(s). {status, message, data}
  */
-const findAllContent = async (req,res) => {
+const findAllLang = async (req,res) => {
   try {
     let options = {};
     let query = {};
     let validateRequest = validation.validateFilterWithJoi(
       req.body,
-      ContentSchemaKey.findFilterKeys,
-      Content.schema.obj
+      LangSchemaKey.findFilterKeys,
+      Lang.schema.obj
     );
     if (!validateRequest.isValid) {
       return res.validationError({ message: `${validateRequest.message}` });
@@ -82,29 +75,29 @@ const findAllContent = async (req,res) => {
       query = { ...req.body.query };
     }
     if (req.body.isCountOnly){
-      let totalRecords = await dbService.count(Content, query);
+      let totalRecords = await dbService.count(Lang, query);
       return res.success({ data: { totalRecords } });
     }
     if (req.body && typeof req.body.options === 'object' && req.body.options !== null) {
       options = { ...req.body.options };
     }
-    let foundContents = await dbService.paginate( Content,query,options);
-    if (!foundContents || !foundContents.data || !foundContents.data.length){
+    let foundLangs = await dbService.paginate( Lang,query,options);
+    if (!foundLangs || !foundLangs.data || !foundLangs.data.length){
       return res.recordNotFound(); 
     }
-    return res.success({ data :foundContents });
+    return res.success({ data :foundLangs });
   } catch (error){
     return res.internalServerError({ message:error.message });
   }
 };
         
 /**
- * @description : find document of Content from table by id;
+ * @description : find document of Lang from table by id;
  * @param {Object} req : request including id in request params.
  * @param {Object} res : response contains document retrieved from table.
- * @return {Object} : found Content. {status, message, data}
+ * @return {Object} : found Lang. {status, message, data}
  */
-const getContent = async (req,res) => {
+const getLang = async (req,res) => {
   try {
     let query = {};
     if (!ObjectId.isValid(req.params.id)) {
@@ -112,11 +105,11 @@ const getContent = async (req,res) => {
     }
     query._id = req.params.id;
     let options = {};
-    let foundContent = await dbService.findOne(Content,query, options);
-    if (!foundContent){
+    let foundLang = await dbService.findOne(Lang,query, options);
+    if (!foundLang){
       return res.recordNotFound();
     }
-    return res.success({ data :foundContent });
+    return res.success({ data :foundLang });
   }
   catch (error){
     return res.internalServerError({ message:error.message });
@@ -124,17 +117,17 @@ const getContent = async (req,res) => {
 };
     
 /**
- * @description : returns total number of documents of Content.
+ * @description : returns total number of documents of Lang.
  * @param {Object} req : request including where object to apply filters in req body 
  * @param {Object} res : response that returns total number of documents.
  * @return {Object} : number of documents. {status, message, data}
  */
-const getContentCount = async (req,res) => {
+const getLangCount = async (req,res) => {
   try {
     let where = {};
     let validateRequest = validation.validateFilterWithJoi(
       req.body,
-      ContentSchemaKey.findFilterKeys,
+      LangSchemaKey.findFilterKeys,
     );
     if (!validateRequest.isValid) {
       return res.validationError({ message: `${validateRequest.message}` });
@@ -142,146 +135,132 @@ const getContentCount = async (req,res) => {
     if (typeof req.body.where === 'object' && req.body.where !== null) {
       where = { ...req.body.where };
     }
-    let countedContent = await dbService.count(Content,where);
-    return res.success({ data : { count: countedContent } });
+    let countedLang = await dbService.count(Lang,where);
+    return res.success({ data : { count: countedLang } });
   } catch (error){
     return res.internalServerError({ message:error.message });
   }
 };
     
 /**
- * @description : update document of Content with data by id.
+ * @description : update document of Lang with data by id.
  * @param {Object} req : request including id in request params and data in request body.
- * @param {Object} res : response of updated Content.
- * @return {Object} : updated Content. {status, message, data}
+ * @param {Object} res : response of updated Lang.
+ * @return {Object} : updated Lang. {status, message, data}
  */
-const updateContent = async (req,res) => {
+const updateLang = async (req,res) => {
   try {
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
-      ContentSchemaKey.updateSchemaKeys
+      LangSchemaKey.updateSchemaKeys
     );
     if (!validateRequest.isValid) {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
     const query = { _id:req.params.id };
-    let updatedContent = await dbService.updateOne(Content,query,dataToUpdate);
-    if (!updatedContent){
+    let updatedLang = await dbService.updateOne(Lang,query,dataToUpdate);
+    if (!updatedLang){
       return res.recordNotFound();
     }
-    return res.success({ data :updatedContent });
+    return res.success({ data :updatedLang });
   } catch (error){
     return res.internalServerError({ message:error.message });
   }
 };
 
 /**
- * @description : update multiple records of Content with data by filter.
+ * @description : update multiple records of Lang with data by filter.
  * @param {Object} req : request including filter and data in request body.
- * @param {Object} res : response of updated Contents.
- * @return {Object} : updated Contents. {status, message, data}
+ * @param {Object} res : response of updated Langs.
+ * @return {Object} : updated Langs. {status, message, data}
  */
-const bulkUpdateContent = async (req,res)=>{
+const bulkUpdateLang = async (req,res)=>{
   try {
     let filter = req.body && req.body.filter ? { ...req.body.filter } : {};
     let dataToUpdate = {};
-    delete dataToUpdate['addedBy'];
     if (req.body && typeof req.body.data === 'object' && req.body.data !== null) {
-      dataToUpdate = { 
-        ...req.body.data,
-        updatedBy : req.user.id
-      };
+      dataToUpdate = { ...req.body.data, };
     }
-    let updatedContent = await dbService.updateMany(Content,filter,dataToUpdate);
-    if (!updatedContent){
+    let updatedLang = await dbService.updateMany(Lang,filter,dataToUpdate);
+    if (!updatedLang){
       return res.recordNotFound();
     }
-    return res.success({ data :{ count : updatedContent } });
+    return res.success({ data :{ count : updatedLang } });
   } catch (error){
     return res.internalServerError({ message:error.message }); 
   }
 };
     
 /**
- * @description : partially update document of Content with data by id;
+ * @description : partially update document of Lang with data by id;
  * @param {obj} req : request including id in request params and data in request body.
- * @param {obj} res : response of updated Content.
- * @return {obj} : updated Content. {status, message, data}
+ * @param {obj} res : response of updated Lang.
+ * @return {obj} : updated Lang. {status, message, data}
  */
-const partialUpdateContent = async (req,res) => {
+const partialUpdateLang = async (req,res) => {
   try {
     if (!req.params.id){
       res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
-    delete req.body['addedBy'];
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
-      ContentSchemaKey.updateSchemaKeys
+      LangSchemaKey.updateSchemaKeys
     );
     if (!validateRequest.isValid) {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
     const query = { _id:req.params.id };
-    let updatedContent = await dbService.updateOne(Content, query, dataToUpdate);
-    if (!updatedContent) {
+    let updatedLang = await dbService.updateOne(Lang, query, dataToUpdate);
+    if (!updatedLang) {
       return res.recordNotFound();
     }
-    return res.success({ data:updatedContent });
+    return res.success({ data:updatedLang });
   } catch (error){
     return res.internalServerError({ message:error.message });
   }
 };
 /**
- * @description : deactivate document of Content from table by id;
+ * @description : deactivate document of Lang from table by id;
  * @param {Object} req : request including id in request params.
- * @param {Object} res : response contains updated document of Content.
- * @return {Object} : deactivated Content. {status, message, data}
+ * @param {Object} res : response contains updated document of Lang.
+ * @return {Object} : deactivated Lang. {status, message, data}
  */
-const softDeleteContent = async (req,res) => {
+const softDeleteLang = async (req,res) => {
   try {
     if (!req.params.id){
       return res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
     let query = { _id:req.params.id };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
-    let updatedContent = await dbService.updateOne(Content, query, updateBody);
-    if (!updatedContent){
+    const updateBody = { isDeleted: true, };
+    let updatedLang = await dbService.updateOne(Lang, query, updateBody);
+    if (!updatedLang){
       return res.recordNotFound();
     }
-    return res.success({ data:updatedContent });
+    return res.success({ data:updatedLang });
   } catch (error){
     return res.internalServerError({ message:error.message }); 
   }
 };
 
 /**
- * @description : delete document of Content from table.
+ * @description : delete document of Lang from table.
  * @param {Object} req : request including id as req param.
  * @param {Object} res : response contains deleted document.
- * @return {Object} : deleted Content. {status, message, data}
+ * @return {Object} : deleted Lang. {status, message, data}
  */
-const deleteContent = async (req,res) => {
+const deleteLang = async (req,res) => {
   try { 
     if (!req.params.id){
       return res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
     const query = { _id:req.params.id };
-    const deletedContent = await dbService.deleteOne(Content, query);
-    if (!deletedContent){
+    const deletedLang = await dbService.deleteOne(Lang, query);
+    if (!deletedLang){
       return res.recordNotFound();
     }
-    return res.success({ data :deletedContent });
+    return res.success({ data :deletedLang });
         
   }
   catch (error){
@@ -290,49 +269,46 @@ const deleteContent = async (req,res) => {
 };
     
 /**
- * @description : delete documents of Content in table by using ids.
+ * @description : delete documents of Lang in table by using ids.
  * @param {Object} req : request including array of ids in request body.
  * @param {Object} res : response contains no of documents deleted.
  * @return {Object} : no of documents deleted. {status, message, data}
  */
-const deleteManyContent = async (req, res) => {
+const deleteManyLang = async (req, res) => {
   try {
     let ids = req.body.ids;
     if (!ids || !Array.isArray(ids) || ids.length < 1) {
       return res.badRequest();
     }
     const query = { _id:{ $in:ids } };
-    const deletedContent = await dbService.deleteMany(Content,query);
-    if (!deletedContent){
+    const deletedLang = await dbService.deleteMany(Lang,query);
+    if (!deletedLang){
       return res.recordNotFound();
     }
-    return res.success({ data :{ count :deletedContent } });
+    return res.success({ data :{ count :deletedLang } });
   } catch (error){
     return res.internalServerError({ message:error.message }); 
   }
 };
 /**
- * @description : deactivate multiple documents of Content from table by ids;
+ * @description : deactivate multiple documents of Lang from table by ids;
  * @param {Object} req : request including array of ids in request body.
- * @param {Object} res : response contains updated documents of Content.
- * @return {Object} : number of deactivated documents of Content. {status, message, data}
+ * @param {Object} res : response contains updated documents of Lang.
+ * @return {Object} : number of deactivated documents of Lang. {status, message, data}
  */
-const softDeleteManyContent = async (req,res) => {
+const softDeleteManyLang = async (req,res) => {
   try {
     let ids = req.body.ids;
     if (!ids || !Array.isArray(ids) || ids.length < 1) {
       return res.badRequest();
     }
     const query = { _id:{ $in:ids } };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
-    let updatedContent = await dbService.updateMany(Content,query, updateBody);
-    if (!updatedContent) {
+    const updateBody = { isDeleted: true, };
+    let updatedLang = await dbService.updateMany(Lang,query, updateBody);
+    if (!updatedLang) {
       return res.recordNotFound();
     }
-    return res.success({ data:{ count :updatedContent } });
+    return res.success({ data:{ count :updatedLang } });
         
   } catch (error){
     return res.internalServerError({ message:error.message }); 
@@ -340,16 +316,16 @@ const softDeleteManyContent = async (req,res) => {
 };
 
 module.exports = {
-  addContent,
-  bulkInsertContent,
-  findAllContent,
-  getContent,
-  getContentCount,
-  updateContent,
-  bulkUpdateContent,
-  partialUpdateContent,
-  softDeleteContent,
-  deleteContent,
-  deleteManyContent,
-  softDeleteManyContent    
+  addLang,
+  bulkInsertLang,
+  findAllLang,
+  getLang,
+  getLangCount,
+  updateLang,
+  bulkUpdateLang,
+  partialUpdateLang,
+  softDeleteLang,
+  deleteLang,
+  deleteManyLang,
+  softDeleteManyLang    
 };

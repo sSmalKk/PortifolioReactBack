@@ -25,7 +25,6 @@ const addBlog = async (req, res) => {
     if (!validateRequest.isValid) {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
-    dataToCreate.addedBy = req.user.id;
     dataToCreate = new Blog(dataToCreate);
     let createdBlog = await dbService.create(Blog,dataToCreate);
     return res.success({ data : createdBlog });
@@ -46,12 +45,6 @@ const bulkInsertBlog = async (req,res)=>{
       return res.badRequest();
     }
     let dataToCreate = [ ...req.body.data ];
-    for (let i = 0;i < dataToCreate.length;i++){
-      dataToCreate[i] = {
-        ...dataToCreate[i],
-        addedBy: req.user.id
-      };
-    }
     let createdBlogs = await dbService.create(Blog,dataToCreate);
     createdBlogs = { count: createdBlogs ? createdBlogs.length : 0 };
     return res.success({ data:{ count:createdBlogs.count || 0 } });
@@ -157,10 +150,7 @@ const getBlogCount = async (req,res) => {
  */
 const updateBlog = async (req,res) => {
   try {
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       BlogSchemaKey.updateSchemaKeys
@@ -189,12 +179,8 @@ const bulkUpdateBlog = async (req,res)=>{
   try {
     let filter = req.body && req.body.filter ? { ...req.body.filter } : {};
     let dataToUpdate = {};
-    delete dataToUpdate['addedBy'];
     if (req.body && typeof req.body.data === 'object' && req.body.data !== null) {
-      dataToUpdate = { 
-        ...req.body.data,
-        updatedBy : req.user.id
-      };
+      dataToUpdate = { ...req.body.data, };
     }
     let updatedBlog = await dbService.updateMany(Blog,filter,dataToUpdate);
     if (!updatedBlog){
@@ -217,11 +203,7 @@ const partialUpdateBlog = async (req,res) => {
     if (!req.params.id){
       res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
-    delete req.body['addedBy'];
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       BlogSchemaKey.updateSchemaKeys
@@ -251,10 +233,7 @@ const softDeleteBlog = async (req,res) => {
       return res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
     let query = { _id:req.params.id };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedBlog = await dbService.updateOne(Blog, query, updateBody);
     if (!updatedBlog){
       return res.recordNotFound();
@@ -324,10 +303,7 @@ const softDeleteManyBlog = async (req,res) => {
       return res.badRequest();
     }
     const query = { _id:{ $in:ids } };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedBlog = await dbService.updateMany(Blog,query, updateBody);
     if (!updatedBlog) {
       return res.recordNotFound();

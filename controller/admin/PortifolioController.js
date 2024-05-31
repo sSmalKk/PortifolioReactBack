@@ -32,7 +32,6 @@ const addPortifolio = async (req, res) => {
     if (!validateRequest.isValid) {
       return res.validationError({ message : `Invalid values in parameters, ${validateRequest.message}` });
     }
-    dataToCreate.addedBy = req.user.id;
     dataToCreate = new Portifolio(dataToCreate);
     let createdPortifolio = await dbService.create(Portifolio,dataToCreate);
     return res.success({ data : createdPortifolio });
@@ -60,7 +59,6 @@ const bulkInsertPortifolio = async (req,res)=>{
           'addedBy':(req && req.user && req.user.id ? req.user.id.toString() : null)
         },
         ...dataToCreate[i],
-        addedBy: req.user.id
       };
     }
     let createdPortifolios = await dbService.create(Portifolio,dataToCreate);
@@ -174,7 +172,6 @@ const updatePortifolio = async (req,res) => {
         'updatedBy':(req && req.user && req.user.id ? req.user.id.toString() : null)
       },
       ...req.body,
-      updatedBy:req.user.id,
     };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
@@ -204,7 +201,6 @@ const bulkUpdatePortifolio = async (req,res)=>{
   try {
     let filter = req.body && req.body.filter ? { ...req.body.filter } : {};
     let dataToUpdate = {};
-    delete dataToUpdate['addedBy'];
     if (req.body && typeof req.body.data === 'object' && req.body.data !== null) {
       dataToUpdate = { 
         ...{
@@ -212,7 +208,6 @@ const bulkUpdatePortifolio = async (req,res)=>{
           'updatedBy':(req && req.user && req.user.id ? req.user.id.toString() : null)
         },
         ...req.body.data,
-        updatedBy : req.user.id
       };
     }
     let updatedPortifolio = await dbService.updateMany(Portifolio,filter,dataToUpdate);
@@ -236,11 +231,7 @@ const partialUpdatePortifolio = async (req,res) => {
     if (!req.params.id){
       res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
-    delete req.body['addedBy'];
-    let dataToUpdate = {
-      ...req.body,
-      updatedBy:req.user.id,
-    };
+    let dataToUpdate = { ...req.body, };
     let validateRequest = validation.validateParamsWithJoi(
       dataToUpdate,
       PortifolioSchemaKey.updateSchemaKeys
@@ -270,10 +261,7 @@ const softDeletePortifolio = async (req,res) => {
       return res.badRequest({ message : 'Insufficient request parameters! id is required.' });
     }
     let query = { _id:req.params.id };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedPortifolio = await dbService.updateOne(Portifolio, query, updateBody);
     if (!updatedPortifolio){
       return res.recordNotFound();
@@ -343,10 +331,7 @@ const softDeleteManyPortifolio = async (req,res) => {
       return res.badRequest();
     }
     const query = { _id:{ $in:ids } };
-    const updateBody = {
-      isDeleted: true,
-      updatedBy: req.user.id,
-    };
+    const updateBody = { isDeleted: true, };
     let updatedPortifolio = await dbService.updateMany(Portifolio,query, updateBody);
     if (!updatedPortifolio) {
       return res.recordNotFound();
